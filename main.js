@@ -6,24 +6,16 @@ const path = require('path')
 const busboy = require('busboy');
 
 const data = generateData();
-fs.writeFileSync("photos.txt", JSON.stringify(data.photos));
-fs.writeFileSync("comments.txt", JSON.stringify(data.comments));
+fs.writeFileSync("photos.txt", JSON.stringify(data));
+
 http.createServer(function (request, response) {
     response.writeHead(200, {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
     const url = request.url;
     if (request.method === "GET"){
     
         if(url === "/photos"){
-            const dataPhotos = fs.readFileSync("photos.txt", "utf-8");
-
-            response.write(dataPhotos);
-            response.end();
-        }
-
-        if(url === "/comments"){
-            const dataComments = fs.readFileSync("comments.txt", "utf-8");
-
-            response.write(dataComments);
+            const photos = fs.readFileSync("photos.txt", "utf-8");
+            response.write(photos);
             response.end();
         }
     } else if(request.method === "POST"){
@@ -39,10 +31,8 @@ http.createServer(function (request, response) {
             bb.on('close', () => {
                 console.log(filename);
                 const data = generateData();
-                fs.writeFileSync("photos.txt", JSON.stringify(data.photos));
-                fs.writeFileSync("comments.txt", JSON.stringify(data.comments));
-                const newPhoto = data.photos.find(photo => photo.url === `http://localhost:4000/photos/${filename}`);  
-                response.write(JSON.stringify([newPhoto]));
+                fs.writeFileSync("photos.txt", JSON.stringify(data));
+                response.write(JSON.stringify(data));
                 response.end();
             });
             request.pipe(bb);
